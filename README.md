@@ -1,4 +1,4 @@
-# Material Icon Theme
+# Symbols Icon Theme
 
 Symbols icons for [Zed](https://zed.dev/).
 
