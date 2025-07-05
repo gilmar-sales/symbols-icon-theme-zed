@@ -1,6 +1,6 @@
 {
   "name": "symbols-icon-theme",
-  "version": "1.0.0",
+  "version": "0.0.24",
   "description": "Symbols Design Icons for Zed",
   "scripts": {
     "build": "npx tsx src/build.ts"
