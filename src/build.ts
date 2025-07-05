@@ -12,8 +12,14 @@ const zedManifest = {
   themes: [zedIconTheme],
 };
 
+var iconThemesDir = join(__dirname, "../icon_themes");
+
+if (!fs.existsSync(iconThemesDir)) {
+  fs.mkdirSync(iconThemesDir, { recursive: true });
+}
+
 writeFileSync(
-  join(__dirname, "../icon_themes", "symbols-icon-theme.json"),
+  join(iconThemesDir, "symbols-icon-theme.json"),
   JSON.stringify(zedManifest, null, 2),
 );
 
