@@ -2,6 +2,6 @@ id = "symbols-icon-theme"
 name = "Symbols Icon Theme"
 version = "0.0.24"
 schema_version = 1
-authors = ["Gilmar Sales"]
+authors = ["Miguel Solorio", "Gilmar Sales"]
 description = "A port of miguelsolorio's Symbols Icon Theme for Zed."
 repository = "https://github.com/gilmar-sales/symbols-icon-theme-zed"
