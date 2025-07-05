@@ -2,10 +2,14 @@
   "name": "symbols-icon-theme",
   "version": "0.0.24",
   "description": "Symbols Design Icons for Zed",
+  "type": "module",
   "scripts": {
-    "build": "npx tsx src/build.ts"
+    "build": "npx tsx src/build.ts",
+    "format": "biome format --config-path=./biome.json --fix --write src/**.ts"
   },
   "devDependencies": {
-    "@types/node": "^22.14.1"
+    "@biomejs/biome": "2.0.6",
+    "@types/node": "^22.14.1",
+    "simple-git": "^3.28.0"
   }
 }

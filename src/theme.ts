@@ -1,7 +1,8 @@
-import { exec } from "child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { simpleGit } from "simple-git";
 import type { IconTheme } from "./types/icon-theme";
-import fs from "fs";
-import path from "path";
+import type { VSCodeIconTheme } from "./types/vscode-icon-theme";
 
 const symbolsRepository = "https://github.com/miguelsolorio/vscode-symbols.git";
 
@@ -15,30 +16,54 @@ const keyMapping: { [key: string]: string } = {
   template: "templ",
 };
 
-export const getRepoDir = () => {
-  const buildDir = path.join(__dirname, "../build");
+const updateToLatestTag = async (repoDir: string) => {
+  const git = simpleGit({
+    baseDir: repoDir,
+    binary: "git",
+    maxConcurrentProcesses: 1,
+    trimmed: false,
+  });
 
-  if (!fs.existsSync(buildDir)) {
-    fs.mkdirSync(buildDir, { recursive: true });
-  }
+  const tags = await git.tags();
 
-  const repoDir = path.join(buildDir, "./symbols");
+  const latestTag = tags?.latest;
+
+  console.log(`Updating Symbols Repository to: ${latestTag}`);
+
+  await git.pull(symbolsRepository, latestTag);
+};
+
+const getRepoDir = async (): Promise<string> => {
+  const baseDir = path.join(import.meta.dirname, "../");
+
+  const repoDir = path.join(baseDir, "./symbols");
 
   if (!fs.existsSync(repoDir)) {
-    exec(`cd ${buildDir} && git clone ${symbolsRepository} symbols`);
-  } else {
-    exec(`cd build/symbols && git clone pull`);
+    const git = simpleGit({
+      baseDir: baseDir,
+      binary: "git",
+      maxConcurrentProcesses: 1,
+      trimmed: false,
+    });
+
+    console.log(`Cloning Symbols Repository in: ${repoDir}`);
+
+    await git.clone(symbolsRepository, repoDir);
   }
+
+  await updateToLatestTag(repoDir);
 
   return repoDir;
 };
 
-export const getTheme = (): IconTheme => {
+export const repositoryDir = await getRepoDir();
+
+export const getTheme = async (): Promise<IconTheme> => {
   const data = fs.readFileSync(
-    path.join(getRepoDir(), "./src/symbol-icon-theme.json"),
+    path.join(repositoryDir, "./src/symbol-icon-theme.json"),
     "utf-8",
   );
-  const symbolsIconTheme = JSON.parse(data);
+  const symbolsIconTheme = JSON.parse(data) as VSCodeIconTheme;
 
   const transformedIconDefinitions = Object.fromEntries(
     Object.entries(symbolsIconTheme.iconDefinitions ?? {})
@@ -46,7 +71,7 @@ export const getTheme = (): IconTheme => {
       .map(([key, value]) => [
         keyMapping[key] || key, // Apply key renaming if a mapping exists
         {
-          path: <string>value.iconPath,
+          path: value.iconPath,
         },
       ]),
   );
@@ -59,8 +84,8 @@ export const getTheme = (): IconTheme => {
     symbolsIconTheme.fileNames ?? {},
   ).reduce(
     (acc, [key, value]) => {
-      acc[key.toLowerCase()] = <string>value;
-      acc[key.toUpperCase()] = <string>value;
+      acc[key.toLowerCase()] = value;
+      acc[key.toUpperCase()] = value;
       return acc;
     },
     {} as { [key: string]: string },
