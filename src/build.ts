@@ -1,48 +1,50 @@
-import fs, { writeFileSync } from "node:fs";
-import { join } from "node:path";
+import fs from "node:fs";
+import path from "node:path";
 import { getTheme, repositoryDir } from "./theme";
 
 const zedIconTheme = await getTheme();
 
 const zedManifest = {
-	$schema: "https://zed.dev/schema/icon_themes/v0.2.0.json",
-	name: "Symbols Icon Theme",
-	author: "Zed Industries",
-	themes: [zedIconTheme],
+  $schema: "https://zed.dev/schema/icon_themes/v0.2.0.json",
+  name: "Symbols Icon Theme",
+  author: "Zed Industries",
+  themes: [zedIconTheme],
 };
 
-var iconThemesDir = join(import.meta.dirname, "../icon_themes");
+var iconThemesDir = path.join(import.meta.dirname, "../icon_themes");
 
 if (!fs.existsSync(iconThemesDir)) {
-	fs.mkdirSync(iconThemesDir, { recursive: true });
+  fs.mkdirSync(iconThemesDir, { recursive: true });
 }
 
-writeFileSync(
-	join(iconThemesDir, "symbols-icon-theme.json"),
-	JSON.stringify(zedManifest, null, 2),
+fs.writeFileSync(
+  path.join(iconThemesDir, "symbols-icon-theme.json"),
+  JSON.stringify(zedManifest, null, 2),
 );
 
 const copyIcons = (sourceDir: string, destDir: string) => {
-	if (!fs.existsSync(destDir)) {
-		fs.mkdirSync(destDir, { recursive: true });
-	}
+  if (!fs.existsSync(destDir)) {
+    fs.mkdirSync(destDir, { recursive: true });
+  }
 
-	fs.readdirSync(sourceDir).forEach((file) => {
-		const sourceFile = join(sourceDir, file);
-		const destFile = join(destDir, file);
-		fs.copyFileSync(sourceFile, destFile);
-	});
+  fs.readdirSync(sourceDir).forEach((file) => {
+    const sourceFile = path.join(sourceDir, file);
+    const destFile = path.join(destDir, file);
+    fs.copyFileSync(sourceFile, destFile);
+  });
 };
 
 // Copy icons from repo to the icons directory
 copyIcons(
-	join(repositoryDir, "./src/icons/files"),
-	join(import.meta.dirname, "../icons/files"),
+  path.join(repositoryDir, "./src/icons/files"),
+  path.join(import.meta.dirname, "../icons/files"),
 );
 
 copyIcons(
-	join(repositoryDir, "./src/icons/folders"),
-	join(import.meta.dirname, "../icons/folders"),
+  path.join(repositoryDir, "./src/icons/folders"),
+  path.join(import.meta.dirname, "../icons/folders"),
 );
+
+fs.rmSync(repositoryDir, { recursive: true });
 
 console.log("Symbols Icon Theme icons copied successfuly.");
