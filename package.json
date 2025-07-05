@@ -1,0 +1,11 @@
+{
+  "name": "symbols-icon-theme",
+  "version": "1.0.0",
+  "description": "Symbols Design Icons for Zed",
+  "scripts": {
+    "build": "npx tsx src/build.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1"
+  }
+}
